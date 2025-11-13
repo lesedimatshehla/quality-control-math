@@ -14,8 +14,8 @@ app.secret_key = "supersecretkey"
 COIN_TO_USD = 0.10
 
 # Your SANDBOX PayPal credentials (replace with your actual sandbox keys)
-#CLIENT_ID = "AWlZoWYDBXNzI-YeZaKxjHY-oL4sPeZYYK7Er0yPu11jQ8JjqSVUBCHcV-99k2Mm1dSsFQljmtZN9kCB"
-#CLIENT_SECRET = "EE_LwO5uG-FlfcGYhryd_33OAQDOKayO3C8qGJqea-rkWSiIoOHtwK-N4agoWJDIcbJob83Bzei7lPcK"
+#CLIENT_ID = "AfySt_0a3dKNwQkXTzHfSMp6cZa4Cc8ThgQT_rEaV-EkIhkJG1L7VHC12eRG0cKlaI4KbHKZcGXZi8J7"
+#CLIENT_SECRET = "EO3ITRudAKFdI8r-qtEvu2iTtz8gINkp-JyP_mZFPeIhDK-zSynNlpoftFsw4l7BVNOYMQQ1c-FvTCR0"
 
 # Configure PayPal client in SANDBOX mode
 #paypal_client = PayPalHttpClient(
@@ -198,6 +198,47 @@ def download_csv():
         mimetype="text/csv",
         headers={"Content-Disposition": "attachment;filename=payout_history.csv"}
     )
+@app.route("/login/callback")
+def login_callback():
+    code = request.args.get("code")
+    if not code:
+        return "Login failed or cancelled."
+
+    # Exchange code for access token
+    import requests
+    token_url = "https://api.paypal.com/v1/oauth2/token"
+    userinfo_url = "https://api.paypal.com/v1/identity/openidconnect/userinfo/?schema=openid"
+
+    auth = (CLIENT_ID, CLIENT_SECRET)
+    headers = {"Accept": "application/json"}
+    data = {
+        "grant_type": "authorization_code",
+        "code": code
+    }
+
+    token_response = requests.post(token_url, headers=headers, data=data, auth=auth)
+    token_json = token_response.json()
+    access_token = token_json.get("access_token")
+
+    if not access_token:
+        return "Failed to retrieve access token."
+
+    userinfo_response = requests.get(userinfo_url, headers={
+        "Authorization": f"Bearer {access_token}"
+    })
+    userinfo = userinfo_response.json()
+
+    # Store user info in session
+    session["paypal_user"] = {
+        "name": userinfo.get("name"),
+        "email": userinfo.get("email")
+    }
+
+    return redirect(url_for("index"))
+@app.route("/logout")
+def logout():
+    session.pop("paypal_user", None)
+    return redirect(url_for("index"))
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
