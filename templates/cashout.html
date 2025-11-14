@@ -8,7 +8,8 @@
     <p>Coins: {{ coins }} (USD ${{ usd }})</p>
     <form method="post">
         <label>PayPal Email:</label>
-        <input type="email" name="paypal_email" required>
+        <input type="email" name="paypal_email" required
+               value="{{ session.paypal_user.email if session.paypal_user else '' }}">
         <button type="submit">Cash Out</button>
     </form>
     <p>{{ message }}</p>
