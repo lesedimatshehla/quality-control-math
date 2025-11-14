@@ -1,7 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Math Game</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Load PayPal SDK FIRST -->
+    <script src="https://www.paypal.com/sdk/js?client-id=AYwazerdTT9PRde0K9tCmMjTLtuieD08o-EJ4ZqVymNpJoBvBuWgnBryzuXNWo9sohkIaAFRFh461jdg&components=login"></script>
 </head>
 <body>
     <h1>Math Game</h1>
@@ -15,17 +19,20 @@
 
     <div id="paypal-login-button"></div>
 
-    <script src="https://www.paypal.com/sdk/js?client-id=AYwazerdTT9PRde0K9tCmMjTLtuieD08o-EJ4ZqVymNpJoBvBuWgnBryzuXNWo9sohkIaAFRFh461jdg&components=login"></script>
-
+    <!-- Render PayPal Login Button -->
     <script>
-        paypal.Login.render({
-            appid: "AYwazerdTT9PRde0K9tCmMjTLtuieD08o-EJ4ZqVymNpJoBvBuWgnBryzuXNWo9sohkIaAFRFh461jdg",
-            authend: "live", // change to "sandbox" for production
-            scopes: "openid profile email",
-            containerid: "paypal-login-button",
-            locale: "en-us",
-            returnurl: "https://quality-control-math.onrender.com/login/callback"
-        });
+        if (typeof paypal !== "undefined") {
+            paypal.Login.render({
+                appid: "AYwazerdTT9PRde0K9tCmMjTLtuieD08o-EJ4ZqVymNpJoBvBuWgnBryzuXNWo9sohkIaAFRFh461jdg",
+                authend: "live",
+                scopes: "openid profile email",
+                containerid: "paypal-login-button",
+                locale: "en-us",
+                returnurl: "https://quality-control-math.onrender.com/login/callback"
+            });
+        } else {
+            console.error("PayPal SDK failed to load.");
+        }
     </script>
 
     <style>
@@ -44,6 +51,5 @@
 
     <p>{{ feedback }}</p>
     <a href="{{ url_for('cashout') }}">Cash Out to PayPal</a>
-
 </body>
 </html>
