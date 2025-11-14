@@ -5,14 +5,18 @@
 </head>
 <body>
     <h1>Math Game</h1>
+
     {% if session.paypal_user %}
     <p>Welcome, {{ session.paypal_user.name }} ({{ session.paypal_user.email }})</p>
     <a href="{{ url_for('logout') }}">Log out</a>
     {% else %}
     <p>Please log in with PayPal to personalize your experience.</p>
     {% endif %}
+
     <div id="paypal-login-button"></div>
-    <script src="https://www.paypal.com/sdk/js?client-id=AYwazerdTT9PRde0K9tCmMjTLtuieD08o-EJ4ZqVymNpJoBvBuWgnBryzuXNWo9sohkIaAFRFh461jdg&components=buttons,login&intent=login"></script>
+
+    <script src="https://www.paypal.com/sdk/js?client-id=AYwazerdTT9PRde0K9tCmMjTLtuieD08o-EJ4ZqVymNpJoBvBuWgnBryzuXNWo9sohkIaAFRFh461jdg&components=login"></script>
+
     <script>
         paypal.Login.render({
             appid: "AYwazerdTT9PRde0K9tCmMjTLtuieD08o-EJ4ZqVymNpJoBvBuWgnBryzuXNWo9sohkIaAFRFh461jdg",
@@ -20,9 +24,10 @@
             scopes: "openid profile email",
             containerid: "paypal-login-button",
             locale: "en-us",
-            returnurl: "http://localhost:5000/login/callback"
+            returnurl: "https://quality-control-math.onrender.com/login/callback"
         });
     </script>
+
     <style>
         #paypal-login-button {
             margin: 20px 0;
@@ -30,11 +35,13 @@
     </style>
 
     <p>Coins: {{ coins }} (USD ${{ usd }})</p>
+
     <form method="POST">
         <label>{{ question }}</label>
         <input type="text" name="answer" autocomplete="off">
         <input type="submit" value="Submit">
     </form>
+
     <p>{{ feedback }}</p>
     <a href="{{ url_for('cashout') }}">Cash Out to PayPal</a>
 
